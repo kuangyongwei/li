@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content_main %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.back()" class="">
+                <i class="am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <div class="cate-search">
+            <form action="/search/" method="get">
+                <input type="text" name="q" value="" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+                <input type="submit" class="cate-btn" value=""/>
+            </form>
+
+            <input type="text" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+            <input type="button" class="cate-btn"/>
+        </div>
+    </header>
+
+    {% if query %}
+        <ul class="list-pro" style="margin-top: 20px">
+            {% for result in page %}
+                <li>
+                    <a href="{% url 'sm_goods:detail' result.object.pk %}"><img
+                            src="{{ MEDIA_URL }}{{ result.object.logoaddress }}" class="list-pic1"/></a>
+                    <div class="shop-list-mid" style="width: 65%;">
+                        <div class="tit">
+                            <a href="{% url 'sm_goods:detail' result.object.pk %}">
+                                {{ result.object.goodsSPUid }}{{ result.object.goodsname }}
+                            </a>
+                        </div>
+                        <div class="am-gallery-desc">￥{{ result.object.goodprice }}</div>
+                        <p>销量：{{ result.object.goodssales }}{{ result.object.goodsunit }}</p>
+                    </div>
+                </li>
+                {% empty %}
+                <li>没有找到您搜索的产品！</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}

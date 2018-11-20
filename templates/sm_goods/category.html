@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta_css %}
+    <style>
+        .shop-list-mid .tit a {
+            color: #909090;
+            font-size: 1.4rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: normal;
+            text-overflow: ellipsis;
+        }
+
+        .list-price {
+            background: url({% if order == 2 %}{% static 'images/order-bot.png' %}{% elif order == 3 %}{% static 'images/order-top.png' %}{% else %}{% static 'images/order.png' %}{% endif %}) no-repeat right center;
+        }
+
+
+    </style>
+{% endblock %}
+
+
+{% block content_nav %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.back()" class="">
+                <i class="am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <div class="cate-search">
+            <form action="/search/" method="get">
+                <input type="text" name="q" value="" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+                <input type="submit" class="cate-btn" value=""/>
+            </form>
+
+            <input type="text" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+            <input type="button" class="cate-btn"/>
+        </div>
+    </header>
+{% endblock %}
+
+{% block content_main %}
+    <div style="height: 49px;"></div>
+    <ul class="list-nav">
+
+        <li {% if order == 0 %}class="current"{% endif %}><a href="{% url 'sm_goods:category' cate_id 0 %}">综合</a></li>
+        <li {% if order == 1 %}class="current"{% endif %}><a href="{% url 'sm_goods:category' cate_id 1 %}">销量</a></li>
+
+        <li><a href="{% url 'sm_goods:category' cate_id 2 %}">
+            <i order="{{ order }}" class="list-price">价格</i>
+        </a></li>
+
+        <li {% if order == 4 %}class="current"{% endif %}><a href="{% url 'sm_goods:category' cate_id 4 %}">新品</a></li>
+
+    </ul>
+    <div class="content-list">
+        <div class="list-left">
+            {% for classify in classifys %}
+                <li {% if classify.id == cate_id %}class="current"{% endif %}><a
+                        href="{% url 'sm_goods:category' classify.id order %}">{{ classify.classifyname }}</a></li>
+            {% endfor %}
+        </div>
+        <div class="list-right">
+            <ul class="list-pro">
+                {% for manygood in manygoods %}
+                    <li>
+                        {#                {% url 'sm_goods:detail ' 2 %}#}
+                        <a href="{% url 'sm_goods:detail' manygood.pk %}"><img
+                                src="{{ MEDIA_URL }}{{ manygood.logoaddress }}" class="list-pic"/></a>
+                        <div class="shop-list-mid" style="width: 65%;">
+                            {#                        #}
+                            <div class="tit"><a href="{% url 'sm_goods:detail' manygood.pk %}">{{ manygood.goodsSPUid }}
+                                {{ manygood.goodsname }}
+
+                            </a></div>
+                            <div class="am-gallery-desc">￥{{ manygood.goodprice }}</div>
+                            <p>销量：{{ manygood.goodssales }}{{ manygood.goodsunit }}</p>
+                        </div>
+
+
+                        <div class="list-cart">
+                            <div class="d-stock ">
+                                <a class="decrease">-</a>
+                                <input sku_id="{{ manygood.pk }}" readonly="" class="text_box" name="" type="text"
+                                       value="0">
+                                <a class="increase">+</a>
+                            </div>
+                        </div>
+                        <!--<a href="" class="list-cart"><img src="images/cart.png" width="30"/></a>-->
+                    </li>
+                {% endfor %}
+
+
+            </ul>
+        </div>
+    </div>
+
+    <!--底部-->
+    <div style="height: 55px;"></div>
+    <div class="fix-bot">
+
+        <div class="fix-bot-cart"><a href="{% url 'shoppingcart:shoppingcart' %}"><i
+                id="cart_total11">{{ cart_total }}</i></a></div>
+
+        <a href="tureorder.html" class="list-js">去结算</a>
+        <a href="tureorder.html" class="list-jsk">一键快购</a>
+        <!--<div class="js-text">
+           <p><b>￥217.80</b></p>
+           <p class="js-car">购物满50元免运费</p>
+     </div>-->
+    </div>
+
+
+{% endblock %}
+
+
+{% block footer_js %}
+    <script>
+        //购物数量加减
+        $(function () {
+            $('.increase').click(function () {
+                var self = $(this);
+                var current_num = parseInt(self.siblings('input').val());
+                current_num += 1;
+                if (current_num > 0) {
+                    self.siblings(".decrease").fadeIn();
+                    self.siblings(".text_box").fadeIn();
+                }
+                self.siblings('input').val(current_num);
+                {#update_item(self.siblings('input').data('item-id'));#}
+
+                //直接发送ajax请求,添加购物车数据
+                //准备数据  得到当前商品sku_id, 数量count
+                var sku_id = self.siblings('input').attr("sku_id");
+                {#console.log(sku_id, count)#}
+                var data = {
+                    "sku_id": sku_id,
+                    "count": 1,
+                    "csrfmiddlewaretoken": "{{ csrf_token }}",
+                };
+                console.log(1111)
+                $.post("{% url 'shoppingcart:cartadd' %}", data, function (data) {
+                    {#判断错误的类型#}
+                    console.log(data);
+                    if (data.error == 1) {
+                        //说明没有登陆，请登陆
+                        var rs = confirm("没有登录,是否跳转到登录页面")
+                        if (rs) {
+                            location.href = "{% url 'sm_user:login' %}?next={% url 'sm_goods:category' cate_id order %}"
+                        }
+                    } else if (data.error == 0) {
+                        console.log(data.cart_total);
+                        $("#cart_total11").html(data.cart_total)
+                    } else {
+                        alert(data.msg);
+                    }
+                });
+
+            });
+            $('.decrease').click(function () {
+                var self = $(this);
+                var current_num = parseInt(self.siblings('input').val());
+                if (current_num > 0) {
+                    current_num -= 1;
+                    if (current_num < 1) {
+                        self.fadeOut();
+                        self.siblings(".text_box").fadeOut();
+                    }
+                    self.siblings('input').val(current_num);
+                    //发送ajax请求,减少redis数据库当前sku_id的值,减少1
+                    var sku_id = self.siblings('input').attr("sku_id");
+                    //发送ajax请求
+                    data={
+                        "sku_id":sku_id,
+                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    };
+                    console.log(data)
+
+                    $.post("{% url 'shoppingcart:cartdecrease' %}",data,function(data){
+                       {#console.log(data);#}
+                        //判断错误类型/sku_id是否正常
+                        if(data.error==1){
+                            var rs=confirm("没有登陆，是否跳转到登陆页面");
+                            if(rs){
+                                location.href("{% url 'sm_user:login' %}?next={% url 'sm_goods:category' cate_id order %}")}
+                        }
+                        //如果数据合法
+                        else if(data.error==0){
+                            //当前对应的sku_id数量为redis中的数量
+                              $("#cart_total11").html(data.cart_total)
+                        } else {
+                            alert(data.msg)
+                        }
+                    });
+
+                    update_item(self.siblings('input').data('item-id'));
+                }
+            });
+
+            $(".list-price").on("click", function () {
+                var order = $(this).attr("order")
+                if (order == 2) {
+                    $(this).parent().attr("href", "{% url 'sm_goods:category' cate_id 3%}")
+                }
+                if (order == 3) {
+                    $(this).parent().attr("href", "{% url 'sm_goods:category' cate_id 2%}")
+                }
+            });
+
+            {#$(".list-left">"li").on("click",function () {#}
+            {#    var cate_id=#}
+            {#    $(this).attr("class","")})#}
+
+        })
+
+    </script>
+{% endblock %}
+

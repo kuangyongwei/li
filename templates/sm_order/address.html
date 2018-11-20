@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta_css %}
+    <style type="text/css">
+        ._citys {
+            width: 100%;
+            height: 100%;
+            display: inline-block;
+            position: relative;
+        }
+
+        ._citys span {
+            color: #56b4f8;
+            height: 15px;
+            width: 15px;
+            line-height: 15px;
+            text-align: center;
+            border-radius: 3px;
+            position: absolute;
+            right: 1em;
+            top: 10px;
+            border: 1px solid #56b4f8;
+            cursor: pointer;
+        }
+
+        ._citys0 {
+            width: 100%;
+            height: 34px;
+            display: inline-block;
+            border-bottom: 2px solid #56b4f8;
+            padding: 0;
+            margin: 0;
+        }
+
+        ._citys0 li {
+            float: left;
+            height: 34px;
+            line-height: 34px;
+            overflow: hidden;
+            font-size: 15px;
+            color: #888;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .citySel {
+            background-color: #56b4f8;
+            color: #fff !important;
+        }
+
+        ._citys1 {
+            width: 100%;
+            height: 80%;
+            display: inline-block;
+            padding: 10px 0;
+            overflow: auto;
+        }
+
+        ._citys1 a {
+            height: 35px;
+            display: block;
+            color: #666;
+            padding-left: 6px;
+            margin-top: 3px;
+            line-height: 35px;
+            cursor: pointer;
+            font-size: 13px;
+            overflow: hidden;
+        }
+
+        ._citys1 a:hover {
+            color: #fff;
+            background-color: #56b4f8;
+        }
+
+        .ui-content {
+            border: 1px solid #EDEDED;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        #PoPy {
+            background-color: white !important;
+        }
+
+        .errorinfo {
+            color: red;
+        }
+    </style>
+{% endblock %}
+{% block meta_js %}
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/Popt.js' %}"></script>
+    <script src="{% static 'js/cityJson.js' %}"></script>
+    <script src="{% static 'js/citySet.js' %}"></script>
+{% endblock %}
+
+{% block content_nav %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.back()" class="">
+                <i class="am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            <a href="" class="">新增收货地址</a>
+        </h1>
+    </header>
+{% endblock %}
+
+{% block content_main %}
+    <form action="" id="addressform" method="post">
+        {% csrf_token %}
+        <div style="height: 60px;"></div>
+        <ul class="address">
+            <li>
+                <span style="width: 4rem">地址:</span><span id="city"
+                                                          style="color:#d7d7d7;padding-left:5px; width: 20rem">请选择地址</span>
+            </li>
+            <li id="address" class="errorinfo"></li>
+            <li><input type="text" name="collectbrief" class="add-input" placeholder="请输入详细地址"/></li>
+            <li id="collectbrief" class="errorinfo"></li>
+            <li><input type="text" name="collectperson" class="add-input" placeholder="收货人"/></li>
+            <li id="collectperson" class="errorinfo"></li>
+            <li><input type="text" name="collectphone" class="add-input" placeholder="收货人联系电话"/></li>
+            <li id="collectphone" class="errorinfo"></li>
+        </ul>
+        <div class="moren">
+            <label class="am-checkbox am-warning">
+                <input type="checkbox" name="isDefault" checked="checked" value="1" data-am-ucheck checked>设为默认
+            </label>
+        </div>
+        <input type="button" class="login-btn" value="确认提交">
+    </form>
+
+{% endblock %}
+
+{% block footer_js %}
+    <script type="text/javascript">
+        $("#city").click(function (e) {
+            SelCity(this, e);
+            {#console.log(this);#}
+        });
+
+        //通过ajax提交保存收货人地址
+        $(function () {
+            $(".login-btn").on("click", function () {
+                $(".errorinfo").html('');
+                //获取所有的表单数据
+                var data = $("#addressform").serialize();
+                $.post("{% url 'sm_order:addressadd' %}", data, function (data) {
+                    if (data.ok == 0) {
+                        // 如果成功,就返回订单确认的页面
+                        history.go(-1)
+                    } else {
+                        for (var key in data.errors) {
+                            if (key == 'collectphone' || key == "collectperson" || key == "collectbrief") {
+                                $("#" + key).text(data.errors[key][0]);
+                            } else {
+                                $("#address").text(data.errors[key][0]);
+                            }
+                        }
+
+                    }
+                });
+            });
+        })
+
+
+    </script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content_nav %}
+<header data-am-widget="header" class="am-header am-header-default sq-head ">
+    <div class="am-header-left am-header-nav">
+        <a href="javascript:history.back()" class="">
+            <i class="am-icon-chevron-left"></i>
+        </a>
+    </div>
+    <h1 class="am-header-title">
+        <a href="" class="">注册</a>
+    </h1>
+</header>
+{% endblock %}
+
+{% block content_main %}
+<div style="height: 49px;"></div>
+<!--<div class="login-logo">
+    <img src="images/logo.png" />
+</div>-->
+<div style="height: 3rem;"></div>
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="text" name="mobile" placeholder="请输入手机号" class="login-name">
+    <p class="am-text-danger" style="margin-left: 5%">{{ errors.mobile.0 }}</p>
+
+    <input type="text" name="password1" placeholder="请输入密码" class="login-password">
+    <p class="am-text-danger" style="margin-left: 5%">{{ errors.password1.0 }}</p>
+
+    <input type="password" name="password2" placeholder="确认密码" class="login-name">
+    <p class="am-text-danger" style="margin-left: 5%">{{ errors.password2.0 }}</p>
+    <p class="am-text-danger" style="margin-left: 5%">{{ pwd_error }}</p>
+    <div class="yzm" style="margin-top: 1.5rem;">
+        <input type="text" name="html_verify" class="reg-yzm" placeholder="输入验证码"/>
+        <input type="button" class="yzm-hq" value="获取验证码"/>
+    </div>
+    <p class="am-text-danger" style="margin-left: 5%">{{ errors.html_verify.0 }}</p>
+    <input type="submit" class="login-btn" value="立即注册">
+
+    <div class="agree">
+        <input type="checkbox" name="agree" value="同意" checked="">&nbsp;同意
+        <a href="" class="xy">《用户协议》</a>
+        <div class="r-login">已有账号，请<a href="{% url 'sm_user:login' %}" class="l-login">登录</a></div>
+    </div>
+</form>
+{% endblock %}
+
+{% block footer_js %}
+<script>
+    $(function () {
+        // 验证码按钮上绑定点击事件
+        $(".yzm-hq").on('click', function () {
+            // 由于this会在很多匿名函数中使用，先将其保存在一个变量中
+            // 因为其他匿名函数中有自己的this,会和点击事件的this冲突
+            var that = this;
+            // 获取手机号码
+            phone = $("input[name='mobile']").val();
+            // 通过ajax发送get请求
+
+            $.get('{% url "sm_user:sendMsg" %}', {'phone': phone}, function (data) {
+                //判断是否请求成功
+                if (data.ok == 1) {
+                    // 设定 60 秒后可以重新发送验证码
+                    var time = 60;
+                    // 立马 将按钮禁用 防止重复点击提交
+                    $(that).attr('disabled', true);
+                    // 颜色设置为 灰色
+                    $(that).css({'backgroundColor': "gray"});
+                    // 将按钮提示文字改变
+                    showMsg(that, time);
+                    // 设置周期性执行， 周期性改变显示文字内容
+                    var timer = window.setInterval(function () {
+                        // 时间减少
+                        --time;
+                        // 显示文字
+                        showMsg(that, time);
+                        // 判断是否到期
+                        if (time == 0) {
+                            // 到期后清除定时器
+                            window.clearInterval(timer);
+                            // 启用按钮
+                            $(that).attr('disabled', false);
+                            // 改变颜色和文字内容
+                            $(that).css({'backgroundColor': "#76bb2a"});
+                            $(that).val("获取验证码");
+                        }
+                    }, 1000)
+                } else {
+                    alert(data.msg);
+                }
+            })
+        });
+
+        //改变按钮 倒计时显示内容
+        function showMsg(obj, time) {
+            var msg = time + "秒后重新发送!";
+            $(obj).val(msg);
+        }
+    })
+</script>
+{% endblock %}

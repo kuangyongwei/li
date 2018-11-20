@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content_nav %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.back()" class="">
+                <i class="am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            <a href="" class="">确认订单</a>
+        </h1>
+    </header>
+{% endblock %}
+
+
+{% block content_main %}
+    <div style="height: 49px;"></div>
+
+    <form action="" method="post" id="orderForm">
+        {% csrf_token %}
+        {% if defaultaddress %}
+            <div class="order-name">
+                <a href="{% url 'sm_order:addresslist' %}">
+                    <p class="order-tele">{{ defaultaddress.collectperson }}&nbsp;&nbsp;&nbsp;{{ defaultaddress.collectphone|truncatechars:9 }}</p>
+                    <p class="order-add">
+                        {{ defaultaddress.hcity }}{{ defaultaddress.hproper }}{{ defaultaddress.harea }}{{ defaultaddress.collectbrief }}</p>
+                    <input type="hidden" name="address_id" id="address_id" value="{{ defaultaddress.pk }}">
+                </a>
+                <i class="am-icon-angle-right"></i>
+            </div>
+        {% else %}
+            <div class="add-address">
+                <a href="{% url 'sm_order:addressadd' %}">+新建收货地址</a>
+                <i class="am-icon-angle-right"></i>
+            </div>
+        {% endif %}
+
+        <div style="background: #eee; height: 10px;"></div>
+        <ul class="shopcart-list" style="padding-bottom: 0;">
+
+            {% for good in goodsList %}
+                <li>
+                    <input type="hidden" name="sku_id" value="{{ good.pk }}">
+                    <img src="{{ MEDIA_URL }}{{ good.logoaddress }}" class="shop-pic"/>
+                    <div class="order-mid">
+                        <div class="tit">{{ good.goodsSPUid.SPUname }}{{ good.goodsname }}</div>
+                        <div class="order-price">￥{{ good.goodprice }}<i>X{{ good.count }}</i></div>
+                    </div>
+                </li>
+            {% endfor %}
+
+        </ul>
+        <ul class="order-infor">
+            <li class="order-infor-first">
+                <span>商品总计：</span>
+                ￥<i id="total_sku_price">{{ total_sku_price }}</i>
+            </li>
+            <li class="order-infor-first">
+                <span>选择配送方式：</span>
+                <i>
+                    <select name="transpot" id="transpot">
+                        {% for transpot in transList %}
+                            <option value="{{ transpot.pk }}" data-value="{{ transpot.money }}">
+                                {{ transpot.name }}>>>{{ transpot.money }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </i>
+            </li>
+            {#	    	<li class="order-infor-first">#}
+            {#	    		<a href="">积分抵费></a>#}
+            {#	    	</li>#}
+            {#	    	<li class="order-infor-first">#}
+            {#	    		<a href="">选择优惠券></a>#}
+            {#	    	</li>#}
+        </ul>
+        <div style="background: #eee; height: 10px;"></div>
+        <textarea placeholder="备注说明" class="bz-infor"></textarea>
+
+        <div style="background: #eee; height: 10px;"></div>
+        <div style="height: 55px;"></div>
+        <div class="shop-fix">
+            <div class="order-text">
+                应付总额：￥<span id="total_price">{{ total_price }}</span>
+            </div>
+            <div class="js-btn">提交订单</div>
+        </div>
+    </form>
+
+
+{% endblock %}
+
+{% block footer %}
+    {% include 'footer.html' %}
+{% endblock %}
+
+<!--底部-->
+
+{% block footer_js %}
+    <script>
+        $(function () {
+            {#"#transport"#}
+            $("select[name='transpot']").on("change", function () {
+                var option = $(this).find(":selected");
+                {#console.log(option);#}
+                var transpot_price = option.attr("data-value");
+                console.log(transpot_price);
+                var total_sku_price = $("#total_sku_price").text();
+                console.log(total_sku_price);
+                var total_price2 = parseFloat(total_sku_price) + parseFloat(transpot_price);
+                console.log(total_price2)
+                $("span[id='total_price']").text(total_price2.toFixed(2));
+            });
+            //当点击提交订单的时候,
+            //1 判断地址是否选着
+            //2 准备数据
+            $(".js-btn").on("click", function () {
+                if ($("#address_id").val() == null) {
+                    alert("请选择收货地址");
+                    return;
+                }
+
+                var request_data = $("#orderForm").serialize();
+                $.post("{% url 'sm_order:display' %}", request_data, function (data) {
+                    if (data.error == 0) {
+                        alert("下单成功");
+                        location.href = "{% url 'sm_order:orderpay' %}?order_num="+data.order_num
+                    } else {
+                        alert("下单失败")
+                    }
+                });
+            })
+        });
+    </script>
+{% endblock %}
+ 
+

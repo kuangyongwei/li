@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+ <iframe id='frameFile' name='frameFile' style='display: none;'></iframe>
+    <form class="clearfix" id="jsAvatarForm" enctype="multipart/form-data" autocomplete="off"
+          method="post" action="{% url 'index:user_image' %}" target='frameFile'>
+        <label class="changearea" for="avatarUp">
+            <span id="avatardiv" class="pic">
+                <img width="100" height="100" class="js-img-show" id="avatarShow"
+                     src="{{ MEDIA_URL }}{{ userinf.picture }}"/>
+            </span>
+                <input type="file" name="image" id="avatarUp" class="js-img-up"/>
+            </span>
+        </label>
+        </form>
+<script>
+
+
+</script>
+</body>
+</html>

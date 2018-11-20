@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content_nav %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+    <div class="am-header-left am-header-nav">
+        <a href="javascript:history.back()" class="">
+            <i class="am-icon-chevron-left"></i>
+        </a>
+    </div>
+    <h1 class="am-header-title">
+        <a href="" class="">个人资料</a>
+    </h1>
+</header>
+{% endblock %}
+
+
+{% block content_main %}
+    <div style="height: 49px;"></div>
+<form action="" method="post">
+    {% csrf_token %}
+    <ul class="safty1">
+        <li>
+            <a href="">
+                <i style="margin-top: 25px;">头像</i>
+
+                <div class="infor-pic">
+                    <img src="{{ MEDIA_URL }}{{ userinf.picture }}"/>
+
+                </div>
+            </a>
+        </li>
+        <li>
+	    		<span>
+	    			<i>昵称</i>
+	    			<input type="text" name="nickname" class="infor-tele" vplaceholder="默契"
+                           value="{{ userinf.nickname|default:"" }}"/>
+	    		</span>
+        </li>
+        <li>
+	    		<span>
+	    			<i>性别</i>
+	    			<i class="infor-tele">
+	    				<label class="am-radio-inline">
+                            <input type="radio" name="sex"
+                                   {% if userinf.sex == 1 %}checked="checked"{% endif %}  value="1" data-am-ucheck>男
+				        </label>
+				        <label class="am-radio-inline">
+				          <input type="radio" name="sex"
+                                   {% if userinf.sex == 2 %}checked="checked"{% endif %}  value="2" data-am-ucheck>女
+				        </label>
+                        <label class="am-radio-inline">
+				          <input type="radio" name="sex"
+                                   {% if userinf.sex == 3 %}checked="checked"{% endif %}  value="3" data-am-ucheck>保密
+
+				        </label>
+	    			</i>
+	    		</span>
+        </li>
+        <li>
+	    		<span>
+	    			<i>生日</i>
+                    <input type="date" name="data" class="infor-tele" placeholder="出生日期"
+                           value="{{ user_data|default:"" }}"/>
+	    		</span>
+        </li>
+    </ul>
+    <div style="height: 10px; background: #efefef;"></div>
+    <ul class="safty1">
+        <li>
+            <i>学校</i>
+            <input type="text" name="school" class="infor-tele" placeholder="就读于哪个学校"
+                   value="{{ userinf.school|default:"" }}"/>
+        </li>
+        <li>
+            <i>位置</i>
+            <input type="text" name="address" class="infor-tele" placeholder="详细地址"
+                   value="{{ userinf.address|default:"" }}"/>
+        </li>
+        <li>
+            <i>故乡</i>
+            <input class="infor-tele" name="hometown" placeholder="来自哪里" value="{{ userinf.hometown|default:"" }}"/>
+        </li>
+        <li>
+            <i>手机</i>
+            <input type="text" class="infor-tele" name="phone" placeholder="" value="{{ userinf.phone|default:"" }}"/>
+        </li>
+    </ul>
+    <input type="submit" value="提交"/>
+</form>
+{% endblock %}
+
+

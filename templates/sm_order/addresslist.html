@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content_nav %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+        <div class="am-header-left am-header-nav">
+{#            <a href="javascript:onclick='self.location=document.referrer'" class="">#}
+                <a href="javascript:" onclick="self.location=document.referrer;">
+                    <i class="am-icon-chevron-left"></i>
+                </a>
+{#            </a>#}
+        </div>
+        <h1 class="am-header-title">
+            <a href="" class="">管理收货地址</a>
+        </h1>
+        <div class="am-header-right am-header-nav">
+            <a href="address.html" class="">
+                <i class="am-icon-plus"></i>
+            </a>
+        </div>
+    </header>
+{% endblock %}
+
+{% block content_main %}
+    <div style="height: 49px;"></div>
+    <ul class="address-list">
+        {% for address in addresslist %}
+            <li {% if address.isDefault %} class="curr"{% endif %}>
+                <p>收货人：{{ address.collectperson }}&nbsp;&nbsp;{{ address.collectphone }}</p>
+                <p class="order-add1">收货地址:
+                    {{ address.hcity }}{{ address.hproper }}{{ address.harea }}{{ address.collectbrief }}
+                </p>
+                <hr/>
+                <div class="address-cz">
+                    <label class="am-radio am-warning">
+                        <input type="radio" name="radio3" defaultaddress="{{ address.pk }}" value="" data-am-ucheck
+                               {% if address.isDefault %}checked{% endif %}> 设为默认
+                    </label>
+                    <a href=""><img src="{% static 'images/bj.png' %}" width="18"/>&nbsp;编辑</a>
+                    <a href="">删除</a>
+                </div>
+            </li>
+        {% endfor %}
+
+        <input type="button" id="queding" class="js-btn" value="确定">
+    </ul>
+
+    {% csrf_token %}
+{% endblock %}
+
+{% block footer_js %}
+    <script>
+        $(function () {
+            $(".address-list").find(":radio").on('change', function () {
+                var defadd_id = $(this).attr("defaultaddress")
+                {#console.log(defadd_id)#}
+                var data = {
+                    "defadd_id": defadd_id,
+                    "csrfmiddlewaretoken": "cYu9t0T6wZ7tpOncQ0JslRpoIbtgZPQa1rPnrWlRnsPR9s6eeMiQxBwmMFJVCfB5",
+                };
+                var that = this;
+                $.post("{% url 'sm_order:addresslist' %}", data, function (data) {
+                    if (data.ok == 0) {
+                        //先清空全部li标签中的class="curr
+                        $(".address-list").find("li").removeClass("curr");
+                        // 设置当前的为curr
+                        $(that).parents("li").addClass("curr")
+                    }
+                });
+            });
+
+        });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>{{ meta_title|default:'超市' }}</title>
+        <meta name="description" content="">
+        <meta name="keywords" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="Cache-Control" content="no-siteapp" />
+        <link rel="icon" type="image/png" href="{% static '/theme/default/images/favicon.png' %}">
+		<link href="{% static 'css/amazeui.min.css' %}" rel="stylesheet" type="text/css" />
+		<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+		<script src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
+		<script>
+        	function changeImage(){
+              document.getElementById("imgflag").src="images/redherat.png";
+           }
+        </script>
+		<style>
+			.am-slider-default .am-control-nav{ text-align: center;}
+			.am-slider-default .am-control-nav li a.am-active{ background: #cb2527;}
+			.am-slider-default .am-control-nav li a{ border: 0; width: 10px; height: 10px;}
+		</style>
+        {% block up_css %}
+
+        {% endblock %}
+
+        {% block up_js %}
+
+        {% endblock %}
+	</head>
+
+	<body>
+		<header data-am-widget="header" class="am-header am-header-default sq-head ">
+			<div class="am-header-left am-header-nav">
+				<a href="javascript:history.back()" class="">
+					<i class="am-icon-chevron-left"></i>
+				</a>
+			</div>
+			<h1 class="am-header-title">
+  	            <a href="" class="">商品详情</a>
+            </h1>
+	    </header>
+
+        {% block middle_1 %}
+
+        {% endblock %}
+
+        {% block middle_2 %}
+
+        {% endblock %}
+
+
+
+
+		<!--底部-->
+ <div style=" height: 55px;"></div>
+ <ul class="fix-shopping">
+ 	<li><a href="shopcart.html" class="join">加入购物车</a></li>
+ 	<li><a href="tureorder.html" class="imm-buy">立即购买</a></li>
+ </ul>
+
+ <script>
+	//购物数量加减
+	$(function(){
+		$('.increase').click(function(){
+			var self = $(this);
+			var current_num = parseInt(self.siblings('input').val());
+			current_num += 1;
+			self.siblings('input').val(current_num);
+			update_item(self.siblings('input').data('item-id'));
+		})
+		$('.decrease').click(function(){
+			var self = $(this);
+			var current_num = parseInt(self.siblings('input').val());
+			if(current_num > 1){
+				current_num -= 1;
+				self.siblings('input').val(current_num);
+				update_item(self.siblings('input').data('item-id'));
+			}
+		})
+	})
+</script>
+
+
+
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/amazeui.min.js' %}"></script>
+        {% block footer %}
+
+        {% endblock %}
+        {% block footer_js %}
+
+        {% endblock %}
+	</body>
+</html>
